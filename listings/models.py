@@ -29,15 +29,19 @@ class Listing(models.Model):
         unique_together = ('user', 'listing_type')
 
     def __str__(self):
-        return f'{self.user.name}  {self.user.last_name}'
+        return f'{self.user.first_name}  {self.user.last_name}'
 
 
 class ListingLanguages(models.Model):
-    language = models.ForeignKey(Languages, max_length=50, null=True, blank=True, on_delete=models.CASCADE)
-    proficiency = models.IntegerField(null=True, blank=True, validators=[MaxValueValidator(10)])
+    listing = models.ForeignKey(Listing, null=True, blank=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Languages, null=True, blank=True, on_delete=models.CASCADE)
+    proficiency = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(10)])
 
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        unique_together = ('listing', 'language')
 
     def __str__(self):
         return f'{self.language}'
