@@ -22,7 +22,7 @@ class CreateAccountView(GenericAPIView):
 
         password = None if request.data.get('password') == '' else request.data.get('password')
 
-        serializer = self.serializer_class(data=user_data)
+        serializer = self.serializer_class(data=user_data, partial=True)
         if serializer.is_valid():
             user = User.objects.create(**serializer.data)
             user.username = serializer.validated_data['email']
