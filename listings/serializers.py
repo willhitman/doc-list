@@ -7,9 +7,15 @@ from utils.models import Address, Languages
 from utils.serializers import AddressSerializer, LanguagesSerializer
 
 
+class ListingLanguageSerializer(ModelSerializer):
+    class Meta:
+        model = ListingLanguages
+        exclude = ['date_created', 'last_updated']
+
+
 class ListingSerializer(ModelSerializer):
     address = AddressSerializer()
-
+    languages = ListingLanguageSerializer(many=True)
     class Meta:
         model = Listing
         exclude = ['date_created', 'last_updated']
@@ -23,8 +29,8 @@ class ListingSerializer(ModelSerializer):
             validated_data['address'] = address
         listing = Listing.objects.create(**validated_data)
         if languages:
-            languages = [Languages.objects.filter(pk_in=languages)]
-            listing.languages.set(languages)
+            _languages =[ListingLanguages.objects.create(**lang) for lang in languages]
+            listing.languages.set(_languages)
         return listing
 
     def update(self, instance, validated_data):
@@ -52,7 +58,7 @@ class ListingSerializer(ModelSerializer):
 class ListingListSerializer(ModelSerializer):
     address = AddressSerializer()
     user = UserSerializer()
-    languages = LanguagesSerializer()
+    languages = ListingLanguageSerializer()
 
     class Meta:
         model = Listing
@@ -63,9 +69,3 @@ class ListingListSerializer(ModelSerializer):
         if instance.listing_type == "Practice":
             representation.pop('user', None)
         return representation
-
-
-class ListingLanguageSerializer(ModelSerializer):
-    class Meta:
-        model = ListingLanguages
-        exclude = ['date_created', 'last_updated']
