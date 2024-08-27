@@ -1,5 +1,7 @@
 from django.db import models
 
+import listings.models
+
 
 # Create your models here.
 class Address(models.Model):
@@ -38,23 +40,20 @@ class Languages(models.Model):
 
 
 class Accessibility(models.Model):
-    pricing_choices = (
-        ('Low', 'Low'),
-        ('Mid', 'Mid'),
-        ('High', 'High'),
-        ('Expensive', 'Expensive')
-    )
+
     insurance_choices = (
         ('Yes', 'Yes'),
         ('Cash Only', 'Cash Only')
     )
-    languages = models.ManyToManyField(Languages)
+    listing = models.ForeignKey('listings.Listing', on_delete=models.CASCADE, blank=True, null=True)
     parking = models.BooleanField(default=False)
     wheel_chair_accessible_parking = models.BooleanField(default=True)
     wifi = models.BooleanField(default=False)
     infotainment = models.BooleanField(default=False)
-    pricing = models.CharField(max_length=10, choices=pricing_choices, null=True, blank=True)
     additional_notes = models.CharField(max_length=300, null=True, blank=True)
+
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return self.infotainment
@@ -64,7 +63,7 @@ class Services(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
     description = models.CharField(max_length=500, null=True, blank=True)
 
-    date_create = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
