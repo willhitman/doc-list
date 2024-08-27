@@ -1,31 +1,54 @@
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 
 from utils.models import Insurance
 from utils.serializers import InsuranceSerializer
 
 
-class InsuranceCreateView(GenericAPIView):
-    permission_classes = []
+class CreateInsuranceView(CreateAPIView):
     serializer_class = InsuranceSerializer
     queryset = Insurance.objects.all()
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    authentication_classes = []
 
 
-class InsuranceGetAll(GenericAPIView):
-    permission_classes = []
+class GetUpdateDestroyInsuranceView(GenericAPIView):
     serializer_class = InsuranceSerializer
     queryset = Insurance.objects.all()
+    authentication_classes = []
 
-    def get(self, request):
-        insurances = self.queryset.all()
-        serializer = self.serializer_class(insurances, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request, pk):
+        try:
+            insurance = self.queryset.get(pk=pk)
+        except Insurance.DoesNotExist:
+            return Response({'message': 'Insurance not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = self.serializer_class(insurance)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def put(self, request, pk):
+        try:
+            insurance = self.queryset.get(pk=pk)
+        except Insurance.DoesNotExist:
+            return Response({'message': 'Insurance not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = self.serializer_class(insurance, request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        try:
+            insurance = self.queryset.get(pk=pk)
+        except Insurance.DoesNotExist:
+            return Response({'message': 'Insurance not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            insurance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GetAllInsurancesView(ListAPIView):
+    serializer_class = InsuranceSerializer
+    queryset = Insurance.objects.all()
+    authentication_classes = []
