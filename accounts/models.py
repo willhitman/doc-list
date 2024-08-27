@@ -25,7 +25,9 @@ class User(AbstractUser):
 
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+
     socials = models.ManyToManyField('UserSocials', blank=True)
+
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
 
