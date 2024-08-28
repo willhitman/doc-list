@@ -30,19 +30,3 @@ class CreateAccountView(GenericAPIView):
             user.save()
             return Response({'message': 'Account created successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class CheckServicesView(GenericAPIView):
-#     serializer_class = UserServiceAccountsSerializer
-#     queryset = User.objects.all()
-#     authentication_classes = []
-#
-#     def get(self, request, user_id):
-#         try:
-#             user = self.queryset.get(pk=user_id)
-#         except User.DoesNotExist:
-#             return Response({'error': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             record = UserServiceAccounts.objects.filter(user_id=user.pk)
-#             service_accounts = get_user_service_accounts(record)
-#             print(service_accounts)
-#             return Response(data=service_accounts, status=status.HTTP_200_OK)
