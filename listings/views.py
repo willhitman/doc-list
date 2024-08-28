@@ -1,11 +1,13 @@
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
 
 from .models import Listing, ListingLanguages, ListingSpecialization, ListingAffiliationsAndMemberships, \
     ListingEducationalBackground, ListingExperience, AppointmentsAvailability, ListingServices
 from .serializers import ListingSerializer, ListingListSerializer, ListingLanguageSerializer, \
-    ListingLanguageCreateSerializer, ListingSpecializationSerializer, \
+    ListingLanguageCreateUpdateSerializer, ListingSpecializationSerializer, \
     ListingAffiliationsAndMembershipsSerializer, ListingAffiliationsAndMembershipsCreateSerializer, \
     ListingEducationalBackgroundCreateSerializers, \
     ListingEducationalBackgroundSerializers, ListingExperienceSerializer, AppointmentsAvailabilitySerializer, \
@@ -15,13 +17,13 @@ from .serializers import ListingSerializer, ListingListSerializer, ListingLangua
 class CreateListingView(CreateAPIView):
     serializer_class = ListingSerializer
     queryset = Listing.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetUpdateDeleteListingView(GenericAPIView):
     serializer_class = ListingSerializer
     queryset = Listing.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -57,13 +59,13 @@ class GetUpdateDeleteListingView(GenericAPIView):
 class GetAllListingsView(ListAPIView):
     serializer_class = ListingListSerializer
     queryset = Listing.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetAllListingsByUserIdView(GenericAPIView):
     serializer_class = ListingListSerializer
     queryset = Listing.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
         listings = self.queryset.filter(user_id=user_id)
@@ -74,7 +76,7 @@ class GetAllListingsByUserIdView(GenericAPIView):
 class GetListingsByListingTypeView(GenericAPIView):
     serializer_class = ListingListSerializer
     queryset = Listing.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, listing_type):
         listings = self.queryset.filter(listing_type=listing_type)
@@ -83,15 +85,15 @@ class GetListingsByListingTypeView(GenericAPIView):
 
 
 class CreateListingLanguageView(CreateListingView):
-    serializer_class = ListingLanguageCreateSerializer
+    serializer_class = ListingLanguageCreateUpdateSerializer
     queryset = ListingLanguages.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyListingLanguageView(GenericAPIView):
     serializer_class = ListingLanguageSerializer
     queryset = ListingLanguages.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -128,13 +130,13 @@ class GetUpdateDestroyListingLanguageView(GenericAPIView):
 class CreateListingSpecializationView(CreateAPIView):
     serializer_class = ListingSpecializationSerializer
     queryset = ListingSpecialization.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyListingSpecializationView(GenericAPIView):
     serializer_class = ListingSpecializationSerializer
     queryset = ListingSpecialization.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -171,13 +173,13 @@ class GetUpdateDestroyListingSpecializationView(GenericAPIView):
 class CreateListingAffiliationView(CreateAPIView):
     serializer_class = ListingAffiliationsAndMembershipsCreateSerializer
     queryset = ListingAffiliationsAndMemberships.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyListingAffiliationAndMembershipsView(GenericAPIView):
     serializer_class = ListingAffiliationsAndMembershipsSerializer
     queryset = ListingAffiliationsAndMemberships.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -217,7 +219,7 @@ class GetUpdateDestroyListingAffiliationAndMembershipsView(GenericAPIView):
 class CreateListingEducationalBackgroundView(GenericAPIView):
     serializer_class = ListingEducationalBackgroundCreateSerializers
     queryset = ListingEducationalBackground.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -233,7 +235,7 @@ class CreateListingEducationalBackgroundView(GenericAPIView):
 class GetUpdateDestroyListingEducationalBackgroundView(GenericAPIView):
     serializer_class = ListingEducationalBackgroundSerializers
     queryset = ListingEducationalBackground.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -273,7 +275,7 @@ class GetUpdateDestroyListingEducationalBackgroundView(GenericAPIView):
 class CreateListingExperienceView(GenericAPIView):
     serializer_class = ListingExperienceSerializer
     queryset = ListingExperience.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -288,7 +290,7 @@ class CreateListingExperienceView(GenericAPIView):
 class GetUpdateDestroyListingExperienceView(GenericAPIView):
     serializer_class = ListingExperienceSerializer
     queryset = ListingExperience.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -324,13 +326,13 @@ class GetUpdateDestroyListingExperienceView(GenericAPIView):
 class CreateAppointmentsAvailabilityView(CreateAPIView):
     serializer_class = AppointmentsAvailabilitySerializer
     queryset = AppointmentsAvailability.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyAppointmentsAvailabilityView(GenericAPIView):
     serializer_class = AppointmentsAvailabilitySerializer
     queryset = AppointmentsAvailability.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -369,13 +371,13 @@ class GetUpdateDestroyAppointmentsAvailabilityView(GenericAPIView):
 class CreateListingServicesView(CreateAPIView):
     serializer_class = ListingServicesSerializer
     queryset = ListingServices.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetListingServicesView(GenericAPIView):
     serializer_class = ListingServicesSerializer
     queryset = ListingServices.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
     def get(self, request, pk):
@@ -391,7 +393,7 @@ class GetListingServicesView(GenericAPIView):
 class UpdateDestroyListingServicesView(GenericAPIView):
     serializer_class = ListingServicesUpdateSerializer
     queryset = ListingServices.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         try:

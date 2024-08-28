@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, GenericAPIView
 from rest_framework.response import Response
-
+from rest_framework.permissions import IsAuthenticated
 from utils.models import Languages
 from utils.serializers import LanguagesSerializer
 
@@ -9,13 +9,13 @@ from utils.serializers import LanguagesSerializer
 class CreateLanguageView(CreateAPIView):
     serializer_class = LanguagesSerializer
     queryset = Languages.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyLanguageView(GenericAPIView):
     serializer_class = LanguagesSerializer
     queryset = Languages.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -51,4 +51,4 @@ class GetUpdateDestroyLanguageView(GenericAPIView):
 class GetAllLanguagesView(ListAPIView):
     serializer_class = LanguagesSerializer
     queryset = Languages.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]

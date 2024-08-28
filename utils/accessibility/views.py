@@ -4,18 +4,18 @@ from rest_framework.response import Response
 
 from utils.models import Accessibility
 from utils.serializers import AccessibilitySerializer
-
+from rest_framework.permissions import IsAuthenticated
 
 class CreateAccessibilityView(CreateAPIView):
     serializer_class = AccessibilitySerializer
     queryset = Accessibility.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyAccessibilityView(GenericAPIView):
     serializer_class = AccessibilitySerializer
     queryset = Accessibility.objects.all()
-    authentication_classes = []
+    authentication_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:

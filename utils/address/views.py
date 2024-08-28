@@ -1,15 +1,14 @@
-
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from utils.models import Address
 from utils.serializers import AddressSerializer
-
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 class AddressCreateView(GenericAPIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
@@ -22,7 +21,7 @@ class AddressCreateView(GenericAPIView):
 
 
 class AddressReadUpdateDestroyView(GenericAPIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
