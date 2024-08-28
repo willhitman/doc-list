@@ -61,7 +61,6 @@ class Accessibility(models.Model):
 
 class Services(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
-    description = models.CharField(max_length=500, null=True, blank=True)
 
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
