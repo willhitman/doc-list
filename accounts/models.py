@@ -1,8 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 
 
 # Create your models here.
@@ -11,6 +8,12 @@ class User(AbstractUser):
         ('MALE', 'MALE'),
         ('FEMALE', 'FEMALE')
     )
+
+    ROLES = (
+        ('ADMIN', 'ADMIN'),
+        ('USER', 'USER'),
+    )
+
     username = models.CharField(max_length=20, blank=True, null=True, unique=True)
     email = models.EmailField(max_length=50, blank=True, null=True, unique=True)
 
@@ -27,6 +30,8 @@ class User(AbstractUser):
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     socials = models.ManyToManyField('UserSocials', blank=True)
+
+    role = models.CharField(max_length=10, choices=ROLES, default='USER')
 
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
