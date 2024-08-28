@@ -236,6 +236,7 @@ class ListingServices(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, null=True, blank=True)
 
     service = models.ManyToManyField(to=Services)
+    description = models.CharField(max_length=500, null=True, blank=True)
 
     is_active = models.BooleanField(max_length=6, default=True)
 
