@@ -9,13 +9,13 @@ from rest_framework.permissions import IsAuthenticated
 class CreateInsuranceView(CreateAPIView):
     serializer_class = InsuranceSerializer
     queryset = Insurance.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyInsuranceView(GenericAPIView):
     serializer_class = InsuranceSerializer
     queryset = Insurance.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -51,4 +51,4 @@ class GetUpdateDestroyInsuranceView(GenericAPIView):
 class GetAllInsurancesView(ListAPIView):
     serializer_class = InsuranceSerializer
     queryset = Insurance.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]

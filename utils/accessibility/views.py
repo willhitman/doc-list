@@ -9,13 +9,13 @@ from rest_framework.permissions import IsAuthenticated
 class CreateAccessibilityView(CreateAPIView):
     serializer_class = AccessibilitySerializer
     queryset = Accessibility.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyAccessibilityView(GenericAPIView):
     serializer_class = AccessibilitySerializer
     queryset = Accessibility.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:

@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from utils.models import Services
@@ -9,13 +10,13 @@ from utils.serializers import ServicesSerializer
 class CreateServiceView(CreateAPIView):
     serializer_class = ServicesSerializer
     queryset = Services.objects.all()
-    authentication_classes = []
+    permission_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyServicesView(GenericAPIView):
     serializer_class = ServicesSerializer
     queryset = Services.objects.all()
-    authentication_classes = []
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:

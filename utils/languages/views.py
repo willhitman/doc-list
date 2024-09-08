@@ -9,13 +9,13 @@ from utils.serializers import LanguagesSerializer
 class CreateLanguageView(CreateAPIView):
     serializer_class = LanguagesSerializer
     queryset = Languages.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class GetUpdateDestroyLanguageView(GenericAPIView):
     serializer_class = LanguagesSerializer
     queryset = Languages.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
@@ -51,4 +51,4 @@ class GetUpdateDestroyLanguageView(GenericAPIView):
 class GetAllLanguagesView(ListAPIView):
     serializer_class = LanguagesSerializer
     queryset = Languages.objects.all()
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
