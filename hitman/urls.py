@@ -12,7 +12,7 @@ schema_view = get_schema_view(
         default_version='v1',
         description="Doctor Directory API",
         terms_of_service="",
-        contact=openapi.Contact(email=""),
+        contact=openapi.Contact(email="giftwt9wt@gmail.com"),
         license=openapi.License(name=""),
     ),
     public=True,
@@ -24,8 +24,8 @@ urlpatterns = ([
                    path('api/v1/utils/', include('utils.insurances.urls')),
                    path('api/v1/utils/', include('utils.address.urls')),
                    path('api/v1/utils/', include('utils.languages.urls')),
+                   path('api/v1/utils/', include('utils.service.urls')),
                    path('api/v1/listings/', include('listings.urls')),
-
                    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
                    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
                    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

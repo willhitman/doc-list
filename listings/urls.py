@@ -47,7 +47,9 @@ urlpatterns = [
     path('service/<int:pk>/', views.UpdateDestroyListingServicesView.as_view(),
          name='service-get-update-destroy'),
     path('get-service/<int:pk>/', views.GetListingServicesView.as_view(),
-         name='get-service')
+         name='get-service'),
+    path('get-services-by-listing-id/<int:listing_id>/', views.GetListingServicesByListingIdView.as_view(),
+         name='get-services-by-listing-id')
 
 
 ]
