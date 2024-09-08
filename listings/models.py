@@ -15,7 +15,7 @@ listing_types = (
 
 
 class Listing(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     listing_type = models.CharField(max_length=50, choices=listing_types, null=True, blank=True)
 
     title = models.CharField(max_length=50, null=True, blank=True)
