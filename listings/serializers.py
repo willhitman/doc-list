@@ -12,13 +12,26 @@ from utils.serializers import AddressSerializer, LanguagesSerializer, ServicesSe
 
 # function to handle creation or update of listing languages
 def handle_languages(listing, languages_data):
-    existing_languages = set(listing.languages.all())
+    existing_languages = listing.languages.all()
+    existing_languages_dict = {lang.language_id: lang for lang in existing_languages}
+
     new_languages = []
 
     for lang in languages_data:
-        language_instance, created = ListingLanguages.objects.get_or_create(**lang)
-        if language_instance not in existing_languages:
+        language_id = lang['language'].id
+
+        if language_id not in existing_languages_dict:
+            try:
+                language_instance = ListingLanguages.objects.get(language=language_id)
+            except ListingLanguages.DoesNotExist:
+                language_instance = language_instance.objects.create(**lang)
             new_languages.append(language_instance)
+        else:
+            language = existing_languages_dict[language_id]
+            print(language)
+            if language.proficiency != lang['proficiency']:
+                language.proficiency = lang['proficiency']
+                language.save()
 
     if new_languages:
         listing.languages.add(*new_languages)
@@ -99,7 +112,7 @@ class ListingSerializer(ModelSerializer):
                 if languages_data:
                     handle_languages(listing=instance, languages_data=languages_data)
 
-                ListingLanguages.objects.filter(listings=None).delete()
+                ListingLanguages.objects.filter(listing=None).delete()
 
         return instance
 
@@ -172,11 +185,7 @@ class ListingExperienceSerializer(ModelSerializer):
         exclude = ['date_created', 'last_updated', 'still_employed']
 
 
-
-
-
 class AppointmentsAvailabilitySerializer(ModelSerializer):
-
     class Meta:
         model = AppointmentsAvailability
         exclude = ['date_created', 'last_updated']
@@ -210,8 +219,6 @@ class ListingServicesSerializer(ModelSerializer):
     class Meta:
         model = ListingServices
         exclude = ['date_created', 'last_updated']
-
-
 
 
 class ListingServicesUpdateSerializer(ModelSerializer):
