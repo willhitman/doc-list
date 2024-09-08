@@ -5,7 +5,7 @@ from rest_framework.serializers import ModelSerializer
 
 from accounts.serializers import UserSerializer
 from listings.models import Listing, ListingLanguages, ListingSpecialization, ListingAffiliationsAndMemberships, \
-    ListingEducationalBackground, ListingExperience, AppointmentsAvailability, Days, ListingServices
+    ListingEducationalBackground, ListingExperience, AppointmentsAvailability, ListingServices
 from utils.models import Address, Languages, Services
 from utils.serializers import AddressSerializer, LanguagesSerializer, ServicesSerializer
 
@@ -24,7 +24,7 @@ def handle_languages(listing, languages_data):
         listing.languages.add(*new_languages)
         listing.save()
 
-    ListingLanguages.objects.filter(listings=None).delete()
+    ListingLanguages.objects.filter(listing=None).delete()
 
 
 class ListingLanguageSerializer(ModelSerializer):
@@ -172,22 +172,17 @@ class ListingExperienceSerializer(ModelSerializer):
         exclude = ['date_created', 'last_updated', 'still_employed']
 
 
-class DaysCreateSerializer(ModelSerializer):
-    class Meta:
-        model = Days
-        exclude = ['date_created', 'last_updated']
+
 
 
 class AppointmentsAvailabilitySerializer(ModelSerializer):
-    days = DaysCreateSerializer(required=True, many=True)
 
     class Meta:
         model = AppointmentsAvailability
         exclude = ['date_created', 'last_updated']
 
     def create(self, validated_data):
-        days_data = validated_data.pop('days')
-        days = [Days.objects.create(**day) for day in days_data]
+        days = validated_data.pop('days')
 
         appointment = AppointmentsAvailability.objects.create(**validated_data)
 
@@ -207,44 +202,16 @@ class AppointmentsAvailabilitySerializer(ModelSerializer):
 
         instance.days.set(days_data)
 
+        AppointmentsAvailability.objects.filter(days=None).delete()
         return instance
 
 
 class ListingServicesSerializer(ModelSerializer):
-
     class Meta:
         model = ListingServices
         exclude = ['date_created', 'last_updated']
 
-    def create(self, validated_data):
-        service_data = validated_data.pop('service', [])
-        with transaction.atomic():
-            _services = [Services.objects.create(**serv) for serv in service_data]
 
-            listing_service = ListingServices.objects.create(**validated_data)
-            listing_service.service.set(_services)
-            listing_service.save()
-            return listing_service
-
-    def update(self, instance, validated_data):
-        service_data = validated_data.pop('service', [])
-        existing_services = set(instance.service.all())
-        with transaction.atomic():
-            for attr, value in validated_data.items():
-                setattr(instance, attr, value)
-            instance.save()
-
-            new_services = []
-
-            for service in service_data:
-                service_instance, created = ListingServices.objects.get_or_create(**service)
-                if service_instance not in existing_services:
-                    new_services.append(service_instance)
-
-            if new_services:
-                instance.service.add(*new_services)
-
-            ListingServices.objects.filter(listing=None).delete()
 
 
 class ListingServicesUpdateSerializer(ModelSerializer):
