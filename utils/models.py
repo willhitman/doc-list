@@ -69,3 +69,22 @@ class Services(models.Model):
         return f'{self.name}'
 
 
+days = (
+    ("Monday", "Monday"),
+    ("Tuesday", "Tuesday"),
+    ("Wednesday", "Wednesday"),
+    ("Thursday", "Thursday"),
+    ("Friday", "Friday"),
+    ("Saturday", "Saturday"),
+    ("Sunday", "Sunday")
+)
+
+
+class Days(models.Model):
+    day = models.CharField(choices=days, max_length=50, null=True, blank=True, unique=True)
+
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.day}'

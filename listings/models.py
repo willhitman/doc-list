@@ -58,6 +58,7 @@ class ListingSpecialization(models.Model):
     def __str__(self):
         return self.board_or_certification
 
+    # method for validation before saving
     def clean(self):
         super().clean()
 
@@ -86,6 +87,7 @@ class ListingAffiliationsAndMemberships(models.Model):
     def __str__(self):
         return self.name
 
+    # method for validation before saving
     def clean(self):
         super().clean()
 
@@ -118,6 +120,7 @@ class ListingEducationalBackground(models.Model):
     def __str__(self):
         return {self.institute}
 
+    # method for validation before saving
     def clean(self):
         super().clean()
 
@@ -153,6 +156,7 @@ class ListingExperience(models.Model):
     def __str__(self):
         return self.listing
 
+    # method for validation before saving
     def clean(self):
         super().clean()
 
@@ -171,37 +175,26 @@ class ListingExperience(models.Model):
 
 
 class AppointmentsAvailability(models.Model):
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, null=True, blank=True)
-    days = models.ManyToManyField(to='Days')
+    listing = models.ForeignKey(Listing, on_delete=models.SET_NULL, null=True, blank=True)
+
+    days = models.ManyToManyField(to='utils.Days')
+
     average_wait_time = models.IntegerField(help_text="Expressed in hours as an Integer", null=True, blank=True,
                                             validators=[MinValueValidator(1), MaxValueValidator(20)])
 
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    # method to make sure no residue data will remain in the table create to support the many-to-many field
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # After saving the instance, remove related days if they are empty or not assigned
+        if not self.days.exists():
+            self.days.clear()
+
     def __str__(self):
         return self.days
-
-
-days = (
-    ("Monday", "Monday"),
-    ("Tuesday", "Tuesday"),
-    ("Wednesday", "Wednesday"),
-    ("Thursday", "Thursday"),
-    ("Friday", "Friday"),
-    ("Saturday", "Saturday"),
-    ("Sunday", "Sunday")
-)
-
-
-class Days(models.Model):
-    day = models.CharField(choices=days, max_length=50, null=True, blank=True)
-
-    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.day}'
 
 
 class ListingReviews(models.Model):
@@ -212,6 +205,14 @@ class ListingReviews(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    # method to make sure no residue data will remain in the table create to support the many-to-many field
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # After saving the instance, remove related days if they are empty or not assigned
+        if not self.ratings.exists():
+            self.ratings.clear()
 
     def __str__(self):
         return self.listing
@@ -235,7 +236,8 @@ availability = (
 class ListingServices(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, null=True, blank=True)
 
-    service = models.ManyToManyField(to=Services)
+    service = models.ForeignKey(Services, on_delete=models.CASCADE, null=True, blank=True)
+
     description = models.CharField(max_length=500, null=True, blank=True)
 
     is_active = models.BooleanField(max_length=6, default=True)
