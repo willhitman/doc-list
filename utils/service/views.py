@@ -52,4 +52,4 @@ class GetUpdateDestroyServicesView(GenericAPIView):
 class GetAllServicesView(ListAPIView):
     serializer_class = ServicesSerializer
     queryset = Services.objects.all()
-    authentication_classes = []
+    permission_classes = []
