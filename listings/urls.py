@@ -44,12 +44,17 @@ urlpatterns = [
          name='appointment-get-update-destroy'),
 
     path('service/', views.CreateListingServicesView.as_view(), name='service'),
-    path('service/<int:pk>/', views.UpdateDestroyListingServicesView.as_view(),
+    path('service/<int:pk>/', views.GetUpdateDestroyListingServicesView.as_view(),
          name='service-get-update-destroy'),
-    path('get-service/<int:pk>/', views.GetListingServicesView.as_view(),
-         name='get-service'),
     path('get-services-by-listing-id/<int:listing_id>/', views.GetListingServicesByListingIdView.as_view(),
-         name='get-services-by-listing-id')
+         name='get-services-by-listing-id'),
+
+
+    path('listing-profile-picture/<int:pk>/', views.ProfilePictureView.as_view(), name='listing-profile-picture'),
+    path('listing-specialisation-file/<int:pk>/', views.SpecializationFileUploadView.as_view(),
+         name='listing-specialisation-file'),
+    path('listing-affiliation-file/<int:pk>/', views.AffiliationAndMembershipsFileUploadView.as_view(),
+         name='listing-affiliation-file')
 
 
 ]
