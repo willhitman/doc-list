@@ -47,21 +47,27 @@ class ListingLanguageSerializer(ModelSerializer):
 
 
 class ListingLanguageCreateUpdateSerializer(serializers.Serializer):
-    listing_id = serializers.IntegerField(min_value=1, required=True)
+    listing = serializers.IntegerField(min_value=1, required=True)
     languages = ListingLanguageSerializer(many=True, required=True)
 
     def create(self, validated_data):
-        listing_id = validated_data.pop('listing_id')
+        pk = validated_data.pop('listing')
         languages_data = validated_data.pop('languages', [])
 
         try:
-            listing = Listing.objects.get(pk=listing_id)
+            listing_data = Listing.objects.get(pk=pk)
         except Listing.DoesNotExist:
-            raise serializers.ValidationError({"listing_id": "Listing not found."})
+            raise serializers.ValidationError({"listing": "Listing not found."})
 
         with transaction.atomic():
-            handle_languages(listing=listing, languages_data=languages_data)
-        return listing
+            handle_languages(listing=listing_data, languages_data=languages_data)
+
+        return {
+            'listing': int(pk),
+            'languages': ListingLanguageSerializer(data=listing_data.languages.filter(
+                language__in=[item['language'].id
+                              for item in languages_data])).initial_data
+        }
 
     def update(self, instance, validated_data):
         languages_data = validated_data.pop('languages', [])
@@ -70,6 +76,12 @@ class ListingLanguageCreateUpdateSerializer(serializers.Serializer):
             handle_languages(listing=instance, languages_data=languages_data)
 
         return instance
+
+
+class ListingProfilePictureSerializer(ModelSerializer):
+    class Meta:
+        model = Listing
+        fields = ['pk', 'profile_picture']
 
 
 class ListingSerializer(ModelSerializer):
@@ -133,6 +145,12 @@ class ListingListSerializer(ModelSerializer):
         return representation
 
 
+class ListingSpecializationFileSerializer(ModelSerializer):
+    class Meta:
+        model = ListingSpecialization
+        fields = ['file']
+
+
 class ListingSpecializationSerializer(ModelSerializer):
     class Meta:
         model = ListingSpecialization
@@ -142,7 +160,13 @@ class ListingSpecializationSerializer(ModelSerializer):
 class ListingAffiliationsAndMembershipsCreateSerializer(ModelSerializer):
     class Meta:
         model = ListingAffiliationsAndMemberships
-        exclude = ['date_created', 'last_updated', 'status']
+        exclude = ['date_created', 'last_updated', 'status', 'file']
+
+
+class ListingAffiliationsAndMembershipsFileSerializer(ModelSerializer):
+    class Meta:
+        model = ListingAffiliationsAndMemberships
+        fields = ['file']
 
 
 class ListingAffiliationsAndMembershipsSerializer(ModelSerializer):
@@ -173,8 +197,12 @@ class ListingEducationalBackgroundSerializers(ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.status == 'pending' and instance.end_date > timezone.now().date():
-            representation['status'] = 'finished'
-            instance.status = 'finished'
+            representation['status'] = 'completed'
+            instance.status = 'completed'
+            instance.save()
+        elif instance.end_date >= timezone.now().date():
+            representation['status'] = 'pending'
+            instance.status = 'pending'
             instance.save()
         return representation
 
@@ -182,7 +210,13 @@ class ListingEducationalBackgroundSerializers(ModelSerializer):
 class ListingExperienceSerializer(ModelSerializer):
     class Meta:
         model = ListingExperience
-        exclude = ['date_created', 'last_updated', 'still_employed']
+        exclude = ['date_created', 'last_updated', 'still_employed', 'years_of_experience']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['years_of_experience'] = instance.years_of_experience
+        representation['still_employed'] = instance.still_employed
+        return representation
 
 
 class AppointmentsAvailabilitySerializer(ModelSerializer):
@@ -213,6 +247,11 @@ class AppointmentsAvailabilitySerializer(ModelSerializer):
 
         AppointmentsAvailability.objects.filter(days=None).delete()
         return instance
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation.pop('listing', None)
+        return representation
 
 
 class ListingServicesSerializer(ModelSerializer):
