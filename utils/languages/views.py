@@ -51,4 +51,4 @@ class GetUpdateDestroyLanguageView(GenericAPIView):
 class GetAllLanguagesView(ListAPIView):
     serializer_class = LanguagesSerializer
     queryset = Languages.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
