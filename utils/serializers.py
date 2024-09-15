@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer, ModelSerializer
 
-from utils.models import Address, Insurance, Languages, Services, Accessibility
+from utils.models import Address, Insurance, Languages, Services, Accessibility, Days
 
 
 class AddressSerializer(ModelSerializer):
@@ -32,4 +32,10 @@ class ServicesSerializer(ModelSerializer):
 class AccessibilitySerializer(ModelSerializer):
     class Meta:
         model = Accessibility
+        exclude = ['date_created', 'last_updated']
+
+
+class DaysSerializer(ModelSerializer):
+    class Meta:
+        model = Days
         exclude = ['date_created', 'last_updated']
