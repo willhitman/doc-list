@@ -2,9 +2,10 @@ from rest_framework import status
 from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 
-from utils.models import Accessibility
-from utils.serializers import AccessibilitySerializer
+from utils.models import Accessibility, Days
+from utils.serializers import AccessibilitySerializer, DaysSerializer
 from rest_framework.permissions import IsAuthenticated
+
 
 class CreateAccessibilityView(CreateAPIView):
     serializer_class = AccessibilitySerializer
@@ -46,3 +47,5 @@ class GetUpdateDestroyAccessibilityView(GenericAPIView):
         else:
             accessibility.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
