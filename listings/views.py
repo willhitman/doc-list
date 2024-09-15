@@ -1,9 +1,11 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
-
+from .files import handle_images, handle_pdfs
 from .models import Listing, ListingLanguages, ListingSpecialization, ListingAffiliationsAndMemberships, \
     ListingEducationalBackground, ListingExperience, AppointmentsAvailability, ListingServices
 from .serializers import ListingSerializer, ListingListSerializer, ListingLanguageSerializer, \
@@ -11,7 +13,8 @@ from .serializers import ListingSerializer, ListingListSerializer, ListingLangua
     ListingAffiliationsAndMembershipsSerializer, ListingAffiliationsAndMembershipsCreateSerializer, \
     ListingEducationalBackgroundCreateSerializers, \
     ListingEducationalBackgroundSerializers, ListingExperienceSerializer, AppointmentsAvailabilitySerializer, \
-    ListingServicesSerializer, ListingServicesUpdateSerializer
+    ListingServicesSerializer, ListingServicesUpdateSerializer, ListingProfilePictureSerializer, \
+    ListingSpecializationFileSerializer, ListingAffiliationsAndMembershipsFileSerializer
 
 
 class CreateListingView(CreateAPIView):
@@ -54,6 +57,26 @@ class GetUpdateDeleteListingView(GenericAPIView):
         else:
             listing.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProfilePictureView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk, *args, **kwargs):
+        listing = get_object_or_404(Listing, pk=pk)
+        serializer = ListingProfilePictureSerializer(listing)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk, *args, **kwargs):
+        listing = get_object_or_404(Listing, pk=pk, user=request.user)
+
+        if 'profile-picture' not in request.FILES:
+            return Response({'message': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            uploaded_file = request.FILES['profile-picture']
+            listing.profile_picture = handle_images(uploaded_file)
+            listing.save()
+        return Response({'message': 'Image saved successfully'}, status=status.HTTP_200_OK)
 
 
 class GetAllListingsView(ListAPIView):
@@ -155,7 +178,6 @@ class GetUpdateDestroyListingSpecializationView(GenericAPIView):
         else:
             serializer = self.serializer_class(listing_specialization, request.data, partial=True)
             if serializer.is_valid():
-                serializer.validated_data.pop('status')
                 serializer.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -168,6 +190,26 @@ class GetUpdateDestroyListingSpecializationView(GenericAPIView):
         else:
             listing_specialization.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SpecializationFileUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk, *args, **kwargs):
+        specialization = get_object_or_404(ListingSpecialization, pk=pk)
+        serializer = ListingSpecializationFileSerializer(specialization)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk, *args, **kwargs):
+        specialization = get_object_or_404(ListingSpecialization, pk=pk, listing__user=request.user)
+
+        if 'file' not in request.FILES:
+            return Response({'message': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            uploaded_file = request.FILES['file']
+            specialization.file = handle_pdfs(uploaded_file)
+            specialization.save()
+        return Response({'message': 'File saved successfully'}, status=status.HTTP_200_OK)
 
 
 class CreateListingAffiliationView(CreateAPIView):
@@ -200,7 +242,6 @@ class GetUpdateDestroyListingAffiliationAndMembershipsView(GenericAPIView):
         else:
             serializer = self.serializer_class(listing_affiliation, request.data, partial=True)
             if serializer.is_valid():
-                serializer.validated_data.pop('status')
                 serializer.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -216,6 +257,26 @@ class GetUpdateDestroyListingAffiliationAndMembershipsView(GenericAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class AffiliationAndMembershipsFileUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk, *args, **kwargs):
+        affiliation = get_object_or_404(ListingSpecialization, pk=pk)
+        serializer = ListingAffiliationsAndMembershipsFileSerializer(affiliation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk, *args, **kwargs):
+        affiliation = get_object_or_404(ListingSpecialization, pk=pk, listing__user=request.user)
+
+        if 'file' not in request.FILES:
+            return Response({'message': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            uploaded_file = request.FILES['file']
+            affiliation.file = handle_pdfs(uploaded_file)
+            affiliation.save()
+        return Response({'message': 'File saved successfully'}, status=status.HTTP_200_OK)
+
+
 class CreateListingEducationalBackgroundView(GenericAPIView):
     serializer_class = ListingEducationalBackgroundCreateSerializers
     queryset = ListingEducationalBackground.objects.all()
@@ -224,10 +285,11 @@ class CreateListingEducationalBackgroundView(GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            if serializer.validated_data['listing_type'] == "Practice":
+            if serializer.validated_data['listing'].listing_type == "Practice":
                 return Response({'message': 'Practice cannot have education background'},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
+
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -256,7 +318,6 @@ class GetUpdateDestroyListingEducationalBackgroundView(GenericAPIView):
         else:
             serializer = self.serializer_class(listing_education, request.data, partial=True)
             if serializer.is_valid():
-                serializer.validated_data.pop('status')
                 serializer.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -374,11 +435,10 @@ class CreateListingServicesView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
 
-class GetListingServicesView(GenericAPIView):
-    serializer_class = ListingServicesSerializer
+class GetUpdateDestroyListingServicesView(GenericAPIView):
+    serializer_class = ListingServicesUpdateSerializer
     queryset = ListingServices.objects.all()
     permission_classes = [IsAuthenticated]
-
 
     def get(self, request, pk):
         try:
@@ -388,12 +448,6 @@ class GetListingServicesView(GenericAPIView):
         else:
             serializer = ListingServicesSerializer(listing_service, partial=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class UpdateDestroyListingServicesView(GenericAPIView):
-    serializer_class = ListingServicesUpdateSerializer
-    queryset = ListingServices.objects.all()
-    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         try:
@@ -415,6 +469,7 @@ class UpdateDestroyListingServicesView(GenericAPIView):
         else:
             listing_service.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class GetListingServicesByListingIdView(GenericAPIView):
     serializer_class = ListingServicesUpdateSerializer
