@@ -1,9 +1,12 @@
+import os
+import uuid
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from accounts.models import User
 from utils.models import Address, Services, Languages
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 
 # Create your models here.
 listing_types = (
@@ -19,7 +22,7 @@ class Listing(models.Model):
     listing_type = models.CharField(max_length=50, choices=listing_types, null=True, blank=True)
 
     title = models.CharField(max_length=50, null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='images/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profiles', blank=True, null=True)
     languages = models.ManyToManyField('ListingLanguages', blank=True)
     address = models.OneToOneField(Address, max_length=50, null=True, blank=True, on_delete=models.CASCADE)
 
@@ -61,8 +64,9 @@ class ListingSpecialization(models.Model):
     # method for validation before saving
     def clean(self):
         super().clean()
-
-        if self.date_issued and self.date_issued > timezone.now().date():
+        if self.date_issued is None:
+            raise ValidationError("Date Issued cannot be null")
+        elif self.date_issued > timezone.now().date():
             raise ValidationError("Date Issued cannot be in the future")
 
     def save(self, *args, **kwargs):
@@ -137,8 +141,9 @@ class ListingEducationalBackground(models.Model):
 
 class ListingExperience(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, null=True, blank=True)
-    years_of_experience = models.IntegerField(null=True, blank=True,
-                                              validators=[MinValueValidator(1), MaxValueValidator(20)])
+    years_of_experience = models.CharField(null=True, blank=True,
+                                           max_length=30)  #field is calculated don't bother provide it
+    # will be overwritten
 
     skill = models.CharField(max_length=50, null=True, blank=True)
 
@@ -148,6 +153,7 @@ class ListingExperience(models.Model):
 
     date_from = models.DateField(null=True, blank=True)
     date_to = models.DateField(null=True, blank=True)
+
     still_employed = models.BooleanField(default=True)
 
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -171,6 +177,11 @@ class ListingExperience(models.Model):
 
     def save(self, *args, **kwargs):
         self.clean()
+        if self.date_to < timezone.now().date():
+            date = relativedelta(self.date_to, self.date_from)
+        else:
+            date = relativedelta(timezone.now().date(), self.date_from)
+        self.years_of_experience = f'{date.years} years, {date.months} months'
         super().save(*args, **kwargs)
 
 
@@ -246,6 +257,9 @@ class ListingServices(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        unique_together = ('listing', 'service')
 
     def __str__(self):
         return self.service.name
