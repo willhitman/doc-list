@@ -51,4 +51,4 @@ class GetUpdateDestroyInsuranceView(GenericAPIView):
 class GetAllInsurancesView(ListAPIView):
     serializer_class = InsuranceSerializer
     queryset = Insurance.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
