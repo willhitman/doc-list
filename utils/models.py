@@ -40,12 +40,11 @@ class Languages(models.Model):
 
 
 class Accessibility(models.Model):
-
     insurance_choices = (
         ('Yes', 'Yes'),
         ('Cash Only', 'Cash Only')
     )
-    listing = models.ForeignKey('listings.Listing', on_delete=models.CASCADE, blank=True, null=True)
+    listing = models.OneToOneField('listings.Listing', on_delete=models.CASCADE)
     parking = models.BooleanField(default=False)
     wheel_chair_accessible_parking = models.BooleanField(default=True)
     wifi = models.BooleanField(default=False)
