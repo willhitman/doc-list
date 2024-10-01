@@ -3,7 +3,7 @@ from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 
 from utils.models import Accessibility, Days
-from utils.serializers import AccessibilitySerializer, DaysSerializer
+from utils.serializers import AccessibilitySerializer, DaysSerializer, AccessibilityUpdateSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -33,7 +33,7 @@ class GetUpdateDestroyAccessibilityView(GenericAPIView):
         except Accessibility.DoesNotExist:
             return Response({'message': 'Accessibility not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            serializer = self.serializer_class(accessibility, request.data)
+            serializer = AccessibilityUpdateSerializer(accessibility, request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
