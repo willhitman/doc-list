@@ -41,13 +41,10 @@ class InsuranceTestCase(TestCase):
         response = self.client.post(request_url, request_bulk_body, format='json')
         self.assertEqual(response.status_code, 201)
 
-
-        print(pk)
         request_url = reverse('service-get-update-destroy', args=[pk])
 
         # Test get by id
         response = self.client.get(request_url)
-        print(response)
         self.assertEqual(response.status_code, 200)
 
         # Test update
