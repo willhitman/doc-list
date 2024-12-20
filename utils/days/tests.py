@@ -2,10 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import User
-from listings.models import Listing
 from rest_framework.test import APIClient
-
-from utils.models import Accessibility
 
 
 class AccessibilityTestCase(TestCase):
@@ -63,5 +60,4 @@ class AccessibilityTestCase(TestCase):
         # Test get list
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 200)
-        request_list_object.append(request_object)
         self.assertListEqual(response.data, request_list_object)

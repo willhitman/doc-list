@@ -1,15 +1,28 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.response import Response
 
 from utils.models import Insurance
 from utils.serializers import InsuranceSerializer
 from rest_framework.permissions import IsAuthenticated
 
-class CreateInsuranceView(CreateAPIView):
+
+class CreateInsuranceView(ListCreateAPIView):
     serializer_class = InsuranceSerializer
     queryset = Insurance.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        if isinstance(request.data, list):
+            many = True
+        else:
+            many = False
+
+        serializer = self.get_serializer(data=request.data, many=many)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetUpdateDestroyInsuranceView(GenericAPIView):

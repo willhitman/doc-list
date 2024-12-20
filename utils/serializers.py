@@ -45,7 +45,7 @@ class AccessibilityUpdateSerializer(ModelSerializer):
 
 class DaysListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
-        print(validated_data)
+
         validated_days = []
 
         # Iterate over each item and validate

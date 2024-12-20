@@ -43,9 +43,9 @@ urlpatterns = [
     path('appointment/<int:pk>/', views.GetUpdateDestroyAppointmentsAvailabilityView.as_view(),
          name='appointment-get-update-destroy'),
 
-    path('service/', views.CreateListingServicesView.as_view(), name='service'),
+    path('service/', views.CreateListingServicesView.as_view(), name='listing-service'),
     path('service/<int:pk>/', views.GetUpdateDestroyListingServicesView.as_view(),
-         name='service-get-update-destroy'),
+         name='listing-service-get-update-destroy'),
     path('get-services-by-listing-id/<int:listing_id>/', views.GetListingServicesByListingIdView.as_view(),
          name='get-services-by-listing-id'),
 

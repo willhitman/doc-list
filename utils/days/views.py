@@ -11,7 +11,7 @@ from utils.serializers import DaysSerializer
 class CreateDayView(ListCreateAPIView):
     serializer_class = DaysSerializer
     queryset = Days.objects.all()
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return self.queryset.all()

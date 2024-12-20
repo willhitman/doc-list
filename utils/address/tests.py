@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 from utils.models import Accessibility
 
 
-class AccessibilityListingsCase(TestCase):
+class AccessibilityTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
